@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats - {{ city }} | Immo Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header .search-info {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .results-count {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .results-count strong {
+            color: #667eea;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .property-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4em;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .property-content {
+            padding: 20px;
+        }
+
+        .property-title {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .property-price {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .property-details {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            background: #f5f7fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .detail-item strong {
+            color: #333;
+        }
+
+        .property-location {
+            color: #888;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .property-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .property-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .property-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .demo-badge {
+            display: inline-block;
+            background: #ffd700;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-results h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 Résultats de recherche</h1>
+        <p class="search-info">
+            {{ city | title }} {% if min_surface > 0 %} | Surface min: {{ min_surface }}m²{% endif %}
+        </p>
+        <a href="/" class="back-btn">← Nouvelle recherche</a>
+    </div>
+
+    <div class="results-container">
+        <p class="results-count">
+            <strong>{{ count }}</strong> bien(s) trouvé(s) à <strong>{{ city | title }}</strong>
+            {% if min_surface > 0 %} avec une surface minimale de <strong>{{ min_surface }}m²</strong>{% endif %}
+        </p>
+
+        {% if properties %}
+        <div class="properties-grid">
+            {% for prop in properties %}
+            <div class="property-card">
+                <div class="property-image">
+                    {% if prop.photo %}
+                    <img src="{{ prop.photo }}" alt="{{ prop.title }}" onerror="this.style.display='none'; this.parentElement.innerHTML='🏠';">
+                    {% else %}
+                    🏠
+                    {% endif %}
+                </div>
+                <div class="property-content">
+                    {% if prop.is_demo %}
+                    <span class="demo-badge">⚡ Exemple</span>
+                    {% endif %}
+
+                    <h3 class="property-title">{{ prop.title }}</h3>
+                    <p class="property-price">{{ prop.price_formatted }}</p>
+
+                    <div class="property-details">
+                        {% if prop.surface > 0 %}
+                        <span class="detail-item">📐 <strong>{{ prop.surface }}</strong> m²</span>
+                        {% endif %}
+                        {% if prop.rooms > 0 %}
+                        <span class="detail-item">🚪 <strong>{{ prop.rooms }}</strong> pièce(s)</span>
+                        {% endif %}
+                        {% if prop.bedrooms > 0 %}
+                        <span class="detail-item">🛏️ <strong>{{ prop.bedrooms }}</strong> chambre(s)</span>
+                        {% endif %}
+                    </div>
+
+                    {% if prop.city or prop.address %}
+                    <p class="property-location">📍 {{ prop.address or prop.city }} {{ prop.postal_code }}</p>
+                    {% endif %}
+
+                    {% if prop.description %}
+                    <p class="property-description">{{ prop.description }}</p>
+                    {% endif %}
+
+                    <a href="{{ prop.url }}" target="_blank" class="property-link">Voir l'annonce →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results">
+            <h2>😕 Aucun résultat</h2>
+            <p>Aucun bien trouvé pour cette recherche. Essayez avec d'autres critères.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
